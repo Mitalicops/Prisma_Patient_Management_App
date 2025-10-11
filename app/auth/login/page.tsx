@@ -2,11 +2,10 @@ import { getUser } from "@/actions/patient.actions";
 import { LoginForm } from "@/components/forms/LoginForm";
 import PasskeyModal from "@/components/patient-manager-component/PasskeyModal";
 import { currentRole } from "@/lib/auth";
-import { SearchParamProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 
-const LoginPage = async ({ params: { userId } }: SearchParamProps) => {
+const LoginPage = async () => {
   //const user = await getUser(userId);
 
   const userRole = await currentRole()
