@@ -13,6 +13,10 @@
 
 Prisma Patient Manager is a comprehensive application designed to streamline patient management and appointment scheduling for hospitals. The platform features two main dashboards: one for patients and one for hospital administrators.
 
+## link to app
+
+https://prisma-patient-management-app.vercel.app/
+
 ### Features
 
 - **Patient Dashboard**: 
