@@ -7,8 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo } from "react";
 
-const NewAppointment = async ({ params }: { params: { userId: string } }) => {
-  const userId = await params.userId;
+const NewAppointment = async ({ params }: { params: Promise<{ userId: string }> }) => {
+   const { userId } = await params; 
   const patient = await getPatient(userId);
   const doctors = await getAllDoctors();
 
