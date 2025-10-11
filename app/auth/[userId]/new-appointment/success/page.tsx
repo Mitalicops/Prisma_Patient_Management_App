@@ -1,7 +1,6 @@
-
 import { getAppointment } from "@/actions/appointment.actions";
+import { getDoctorWithAppointmentId } from "@/actions/doctor.actions";
 import { Button } from "@/components/ui/button";
-import { Doctors } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
 import Image from "next/image";
@@ -16,10 +15,7 @@ const SuccessPage = async ({
   const appointmentId = (searchParams?.appointmentId as string) || "";
 
   const appointment = await getAppointment(appointmentId);
-
-  const doctor = Doctors.find(
-    (doc) => doc.name === appointment.primaryPhysician
-  );
+  const doctor = await getDoctorWithAppointmentId(appointmentId);
 
   return (
     <div className="flex h-screen max-h-screen px-[5%]">
@@ -60,8 +56,8 @@ const SuccessPage = async ({
               height={100}
               className="size-6"
             />
-
-            <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+            <p className="whitespace-nowrap">Dr. {doctor?.name}</p>-
+            <p className="whitespace-nowrap">{doctor?.specialization}</p>
           </div>
 
           <div className="flex items-center gap-2">

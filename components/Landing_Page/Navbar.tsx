@@ -35,7 +35,7 @@ const Menu = ({ className }: MenuProps) => (
   </>
 );
 
-const Navbar = () => {
+const Navbar = ({role}: any) => {
   const [toggleMenu, setToggleMenu] = useState(false);
 
   return (
@@ -61,7 +61,7 @@ const Navbar = () => {
         </ul>
         <div className="">
           <Button variant="landing_page" size="lg">
-            <LoginButton>Sign In</LoginButton>
+            <LoginButton role={role}>Sign In</LoginButton>
           </Button>
         </div>
 

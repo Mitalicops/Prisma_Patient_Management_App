@@ -1,12 +1,9 @@
 "use client";
 
-import { storage } from "@/firebase/clientApp";
-import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
-import { useState } from "react";
 import { convertFileToUrl } from "@/lib/utils";
 
 type FileUploaderProps = {
@@ -15,48 +12,20 @@ type FileUploaderProps = {
 };
 
 export const Upload = ({ files, onChange }: FileUploaderProps) => {
-  const [file, setFile] = useState<any>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedUrl, setUploadedUrl] = useState<any>(null);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    onChange(acceptedFiles);
+  }, []);
 
-  const handleFileChange = (event: any) => {
-    setFile(event.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-
-    setUploading(true);
-    const storageRef = ref(storage, `images/${file.name}`);
-
-    try {
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      setUploadedUrl(url);
-      console.log("file Uploaded");
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    } finally {
-      setUploading(false);
-    }
-  };
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div className="file-upload">
-      <input type="file" onChange={handleFileChange} />
-      <button
-        onClick={() => {
-          handleUpload();
-        }}
-        disabled={uploading}
-      >
-        {uploading ? "Uploading..." : "Upload Image"}
-      </button>
-      {uploadedUrl ? (
+    <div {...getRootProps()} className="file-upload">
+      <input {...getInputProps()} />
+      {files && files?.length > 0 ? (
         <Image
-          src={uploadedUrl}
-          width={300}
-          height={300}
+          src={convertFileToUrl(files[0])}
+          width={1000}
+          height={1000}
           alt="uploaded image"
           className="max-h-[400px] overflow-hidden object-cover"
         />
@@ -79,7 +48,6 @@ export const Upload = ({ files, onChange }: FileUploaderProps) => {
           </div>
         </>
       )}
-
     </div>
   );
 };

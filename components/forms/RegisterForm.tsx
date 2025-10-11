@@ -2,11 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectItem } from "@/components/ui/select";
 import {
@@ -27,8 +28,7 @@ import { MdOutlineAlternateEmail } from "react-icons/md";
 
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
-import { Upload } from "../patient-manager-component/upload";
-import { Button } from "../ui/button";
+
 import { RiLockPasswordFill } from "react-icons/ri";
 import { registerPatient } from "@/actions/patient.actions";
 import { SubmitButton } from "../patient-manager-component/SubmitButton";
@@ -37,6 +37,7 @@ const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+  const [imageUrl, setImageUrl] = useState<any>();
 
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
@@ -44,6 +45,12 @@ const RegisterForm = () => {
       ...PatientFormDefaultValues,
     },
   });
+
+  useEffect(() => {
+    if (imageUrl?.secure_url) {
+      form.setValue("identificationDocumentUrl", imageUrl?.secure_url);
+    }
+  }, [imageUrl, form]);
 
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setError("");
@@ -64,6 +71,8 @@ const RegisterForm = () => {
     //formData.append("blobFile", blobFile);
     //formData.append("fileName", values.identificationDocument[0].name);
     //}
+
+    // Store file info in form data as
 
     try {
       const patient = {
@@ -86,7 +95,8 @@ const RegisterForm = () => {
         familyMedicalHistory: values.familyMedicalHistory,
         pastMedicalHistory: values.pastMedicalHistory,
         identificationType: values.identificationType,
-        //identificationNumber: values.identificationNumber,
+        identificationNumber: values.identificationNumber,
+        identificationDocumentUrl: values.identificationDocumentUrl,
         treatmentConsent: values.treatmentConsent,
         disclosureConsent: values.disclosureConsent,
         privacyConsent: values.privacyConsent,
@@ -102,7 +112,6 @@ const RegisterForm = () => {
     } catch (error) {
       console.log(error);
     }
-
   };
 
   return (
@@ -341,11 +350,43 @@ const RegisterForm = () => {
           <CustomForm
             fieldType={FormFieldType.SKELETON}
             control={form.control}
-            name="identificationDocument"
+            name="identificationDocumentUrl"
             label="Scanned Copy of Identification Document"
             renderSkeleton={(field) => (
               <FormControl>
-                <Upload files={field.value} onChange={field.onChange} />
+                <CldUploadWidget
+                  uploadPreset="Hospital_Managment_App_Prisma"
+                  onSuccess={(result, { widget }) => {
+                    setImageUrl(result.info);
+                    widget.close();
+                  }}
+                >
+                  {({ open }) => {
+                    return (
+                      <div className="file-upload" onClick={() => open()}>
+                        <>
+                          <Image
+                            src="/assets/icons/upload.svg"
+                            width={40}
+                            height={40}
+                            alt="upload"
+                          />
+                          <div className="file-upload_label">
+                            <p className="text-14-regular ">
+                              <span className="text-green-500">
+                                Click to upload{" "}
+                              </span>
+                              or drag and drop
+                            </p>
+                            <p className="text-12-regular">
+                              SVG, PNG, JPG or GIF (max. 800x400px)
+                            </p>
+                          </div>
+                        </>
+                      </div>
+                    );
+                  }}
+                </CldUploadWidget>
               </FormControl>
             )}
           />

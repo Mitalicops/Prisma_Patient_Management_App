@@ -44,6 +44,22 @@ interface CustomProps {
 
 const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
+    case FormFieldType.NUMBER:
+      return (
+        <div className="flex rounded-md border items-center border-dark-500 bg-dark-400">
+          {props.iconSrc && <span className="ml-2 text-[23px]">{props.iconSrc}</span>}
+
+          <FormControl>
+            <Input
+              placeholder={props.placeholder}
+              {...field}
+              type="number"
+              className="shad-input border-0"
+            />
+          </FormControl>
+        </div>
+      );
+
     case FormFieldType.INPUT:
       return (
         <div className="flex rounded-md border items-center border-dark-500 bg-dark-400">

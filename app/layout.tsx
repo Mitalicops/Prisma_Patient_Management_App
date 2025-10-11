@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/patient-manager-component/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,8 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
           </ThemeProvider>
+
+          <Toaster/>
         </body>
       </html>
     </SessionProvider>

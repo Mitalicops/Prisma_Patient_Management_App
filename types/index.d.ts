@@ -1,4 +1,4 @@
-import { Patient } from "@/next-auth";
+import { Doctor, Patient, TheUser } from "@/next-auth";
 import { AppointmentStatus, Gender } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
 
@@ -7,11 +7,22 @@ export type Appointment = {
   patient: Patient;
   schedule: Date;
   status: AppointmentStatus;
-  primaryPhysician?: string;
+  // primaryPhysician: string;
   reason?: string;
   note?: string;
   patientId?: string;
+  doctorId: string;
+  Doctor?: Doctor;
   cancellationReason?: string | null;
+};
+
+export type DoctorsAppointment = {
+  id: string;
+  patient: TheUser["patient"];
+  schedule: Date;
+  status: AppointmentStatus;
+  doctorId: string;
+  patientId?: string;
 };
 
 declare type SearchParamProps = {
@@ -31,16 +42,16 @@ declare type Status = "pending" | "scheduled" | "cancelled";
 //isTwoFactorEnabled?: boolean;
 //};
 
-declare interface User extends Patient  {
+declare interface User extends Patient {
   id: string;
 }
 
 declare type CreateAppointmentParams = {
   patientId: string;
-  primaryPhysician: string;
   reason: string;
   schedule: Date;
   status: Status;
+  doctorId: string;
   note: string | undefined;
 };
 
@@ -65,7 +76,20 @@ type UpdateAppointmentParams = {
   type: string;
 };
 
-
-declare interface getUserAppointments  {
+declare interface getUserAppointments {
   id: string | undefined;
 }
+
+export type AIReport = {
+  summary: string; // overall interpretation in plain language
+  abnormalFindings: {
+    parameter: string; // e.g., "Hemoglobin"
+    value: string; // e.g., "10.2 g/dL"
+    normalRange: string; // e.g., "13.5–17.5 g/dL"
+    interpretation: string; // e.g., "Low - Possible anemia"
+  }[];
+  recommendations: string[]; // medical suggestions (e.g., “Repeat test in 1 week”)
+  lifestyleAdvice: string[]; // plain health suggestions (e.g., “Increase iron intake”)
+};
+
+

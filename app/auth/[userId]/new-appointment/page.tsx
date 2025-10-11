@@ -1,3 +1,4 @@
+import { getAllDoctors } from "@/actions/doctor.actions";
 import { getPatient } from "@/actions/patient.actions";
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
 
@@ -8,6 +9,7 @@ import React from "react";
 
 const NewAppointment = async ({ params: { userId } }: SearchParamProps) => {
   const patient = await getPatient(userId);
+  const doctors = await getAllDoctors();
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
@@ -23,6 +25,7 @@ const NewAppointment = async ({ params: { userId } }: SearchParamProps) => {
           <AppointmentForm
             type="create"
             userId={userId}
+            doctors={doctors }
             patientId={patient.id}
           />
 

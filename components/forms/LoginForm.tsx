@@ -8,8 +8,7 @@ import { Form } from "@/components/ui/form";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 
 import { useState } from "react";
-import { LoginSchema, UserFormValidation } from "@/lib/validation";
-import { useRouter } from "next/navigation";
+import { LoginSchema } from "@/lib/validation";
 
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FormFieldType } from "@/constants";
@@ -19,13 +18,16 @@ import { SubmitButton } from "../patient-manager-component/SubmitButton";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { login } from "@/actions/login";
+import { currentRole, currentUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { getUserByEmail } from "@/data/user";
 
 export const LoginForm = () => {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>("");
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [success, setSuccess] = useState<string | undefined>("");
+  const router = useRouter();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -39,8 +41,6 @@ export const LoginForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
       const user = {
@@ -51,7 +51,7 @@ export const LoginForm = () => {
       const newUser = await login(user);
 
       //if (newUser) {
-      //router.push(`/auth/${newUser.id}/more-info`);
+
       //}
 
       if (newUser?.error) {
@@ -62,19 +62,29 @@ export const LoginForm = () => {
       if (newUser?.success) {
         form.reset();
         setSuccess(newUser.success);
+
+        //const role = newUser.role;
+
+        //        if (role === "Admin") {
+        //        router.push("/admin");
+        //    } else if (role === "Doctor") {
+        //    router.push("/dashboard");
+        // } else if (role === "Patient") {
+        // router.push("/patient-admin");
+        //}
       }
 
       if (newUser?.twoFactor) {
         setShowTwoFactor(true);
       }
 
+      setIsLoading(false);
+
       return newUser;
     } catch (error) {
       console.log(error);
       setError("something went wrong");
     }
-
-    setIsLoading(false);
   }
 
   return (

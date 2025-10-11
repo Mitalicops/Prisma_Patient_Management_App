@@ -8,7 +8,6 @@ import Slider from "react-slick";
 import { TestimonialsCard } from "./UI/SpecialistDoc";
 import Section from "@/constants/Section";
 
-
 interface StarIconProps {
   count?: number;
 }

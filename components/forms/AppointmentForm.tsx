@@ -10,10 +10,10 @@ import { useState } from "react";
 import { getAppointmentSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 
-import { Doctors, FormFieldType } from "@/constants";
+import { FormFieldType, Specializations } from "@/constants";
 
 import Image from "next/image";
-import { SelectItem } from "../ui/select";
+import { SelectGroup, SelectItem, SelectLabel } from "../ui/select";
 
 import CustomForm from "../patient-manager-component/CustomForm";
 import { SubmitButton } from "../patient-manager-component/SubmitButton";
@@ -24,16 +24,21 @@ import {
 } from "@/actions/appointment.actions";
 import { AppointmentStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
+import { Doctor } from "@/next-auth";
 
 export const AppointmentForm = ({
   patientId,
   type,
   appointment,
   userId,
+  doctors,
   setOpen,
+  role,
 }: {
   patientId: string | null;
   userId: string;
+  role: "patient" | "admin" | "doctor";
+  doctors?: Doctor[];
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: (open: boolean) => void;
@@ -48,12 +53,12 @@ export const AppointmentForm = ({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
       id: appointment?.id,
-      primaryPhysician: appointment ? appointment.primaryPhysician : "",
       schedule: appointment
         ? new Date(appointment.schedule)
         : new Date(Date.now()),
       reason: appointment ? appointment.reason : "",
       note: appointment ? appointment.note : "",
+      doctorId: appointment ? appointment.doctorId : "",
       cancellationReason: appointment?.cancellationReason || "",
     },
   });
@@ -80,11 +85,11 @@ export const AppointmentForm = ({
       if (type === "create" && patientId) {
         const appointmentData = {
           patientId: userId,
-          primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
           reason: values.reason!,
           note: values.note,
           status: status as AppointmentStatus,
+          doctorId: values.doctorId,
         };
 
         const appointment = await CreateAppointment(appointmentData);
@@ -100,7 +105,6 @@ export const AppointmentForm = ({
           patientId,
           appointmentId: appointment?.id ?? "",
           appointment: {
-            primaryPhysician: values?.primaryPhysician,
             schedule: new Date(values?.schedule),
             status: status as AppointmentStatus,
             cancellationReason: values?.cancellationReason,
@@ -151,31 +155,46 @@ export const AppointmentForm = ({
           </section>
         )}
 
+        {type !== "cancel" && role === "admin" && (
+          <CustomForm
+            fieldType={FormFieldType.SELECT}
+            control={form.control}
+            name="doctorId"
+            label="Doctor"
+            placeholder="Select a Doctor"
+          >
+            {Specializations.map((specialization) => {
+              const doctorsInSpecialization = doctors?.filter(
+                (doctor) => doctor.specialization === specialization.name
+              );
+
+              if (!doctorsInSpecialization?.length) return null;
+
+              return (
+                <SelectGroup key={specialization.name}>
+                  <SelectLabel>{specialization.name}</SelectLabel>
+                  {doctorsInSpecialization.map((doctor) => (
+                    <SelectItem key={doctor.id} value={doctor.id}>
+                      <div className="flex cursor-pointer items-center gap-2">
+                        <Image
+                          src={doctor.image!}
+                          width={32}
+                          height={32}
+                          alt={doctor.name}
+                          className="rounded-full h-8 w-8 border border-dark-500"
+                        />
+                        <p>{doctor.name}</p>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              );
+            })}
+          </CustomForm>
+        )}
+
         {type !== "cancel" && (
           <>
-            <CustomForm
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="primaryPhysician"
-              label="Doctor"
-              placeholder="Select a Doctor"
-            >
-              {Doctors.map((doctor) => (
-                <SelectItem key={doctor.name} value={doctor.name}>
-                  <div className="flex cursor-pointer items-center gap-2">
-                    <Image
-                      src={doctor.image}
-                      width={32}
-                      height={32}
-                      alt={doctor.name}
-                      className="rounded-full border border-dark-500"
-                    />
-                    <p>{doctor.name}</p>
-                  </div>
-                </SelectItem>
-              ))}
-            </CustomForm>
-
             <CustomForm
               fieldType={FormFieldType.DATE_PICKER}
               control={form.control}
@@ -185,23 +204,50 @@ export const AppointmentForm = ({
               dateFormat="MM/dd/yyyy - hh:mm aa"
             />
 
-            <div className="flex flex-col gap-6 xl:flex-row">
-              <CustomForm
-                fieldType={FormFieldType.TEXTAREA}
-                control={form.control}
-                name="reason"
-                label="Reason for Appointment"
-                placeholder="Enter Reason For appointment"
-              />
+            {role === "admin" ||
+              (role === "doctor" && (
+                <div className="flex flex-col gap-6 xl:flex-row">
+                  <CustomForm
+                    fieldType={FormFieldType.TEXTAREA}
+                    control={form.control}
+                    name="reason"
+                    label="Reason for Appointment"
+                    disabled
+                    placeholder="Enter Reason For appointment"
+                  />
 
-              <CustomForm
-                fieldType={FormFieldType.TEXTAREA}
-                control={form.control}
-                name="note"
-                label="Notes"
-                placeholder="Enter Notes"
-              />
-            </div>
+                  <CustomForm
+                    fieldType={FormFieldType.TEXTAREA}
+                    control={form.control}
+                    name="note"
+                    label="Notes"
+                    disabled
+                    placeholder="Enter Notes"
+                  />
+                </div>
+              ))}
+
+            {role === "patient" && (
+              <div className="flex flex-col gap-6 xl:flex-row">
+                <CustomForm
+                  fieldType={FormFieldType.TEXTAREA}
+                  control={form.control}
+                  name="reason"
+                  label="Reason for Appointment"
+                  disabled
+                  placeholder="Enter Reason For appointment"
+                />
+
+                <CustomForm
+                  fieldType={FormFieldType.TEXTAREA}
+                  control={form.control}
+                  name="note"
+                  label="Notes"
+                  disabled
+                  placeholder="Enter Notes"
+                />
+              </div>
+            )}
           </>
         )}
 

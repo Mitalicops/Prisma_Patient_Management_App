@@ -7,7 +7,7 @@ import {
 } from "@/types";
 import { db } from "@/lib/db";
 import { formatDateTime, parseStringify } from "@/lib/utils";
-import { getUserById } from "@/data/user";
+import { getUserById, getUserByTheirId } from "@/data/user";
 import { sendWelcomeEmail } from "@/lib/mail";
 import { currentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -16,16 +16,16 @@ export const CreateAppointment = async (
   appointment: CreateAppointmentParams
 ) => {
   try {
-    const existingUser = await getUserById(appointment.patientId);
+    const existingUser = await getUserByTheirId(appointment.patientId);
 
     const newAppointment = await db.appointment.create({
       data: {
         schedule: appointment.schedule,
         reason: appointment.reason,
         note: appointment.note,
-        primaryPhysician: appointment.primaryPhysician,
         status: appointment.status,
-        patient: { connect: { id: existingUser?.id } },
+        patient: { connect: { id: existingUser.id } },
+        Doctor: { connect: { id: appointment.doctorId } },
       },
     });
 
@@ -55,7 +55,7 @@ export const getAppointmentsForUser = async ({
       orderBy: {
         schedule: "desc",
       },
-      include: { patient: true },
+      include: { patient: true, Doctor: true },
     });
 
     // Initialize counts
@@ -97,7 +97,7 @@ export const getRecentAppointmentsList = async () => {
       orderBy: {
         schedule: "desc",
       },
-      include: { patient: true },
+      include: { patient: true, Doctor: true },
     });
 
     // Initialize counts

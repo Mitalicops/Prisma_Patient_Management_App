@@ -8,10 +8,9 @@ import { db } from "@/lib/db";
 import { getUserByEmail } from "@/data/user";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
-import { FirebaseApp } from "firebase/app";
-import { PatientFormValidation, UserFormValidation } from "@/lib/validation";
-import { uploadFile } from "@/lib/uploadFile";
-import { Patient } from "@/next-auth";
+import { UserFormValidation } from "@/lib/validation";
+import { Doctor, Patient } from "@/next-auth";
+import { UserRole } from "@prisma/client";
 
 export const registerUser = async (
   values: z.infer<typeof UserFormValidation>
@@ -95,8 +94,11 @@ export const registerPatient = async ({ ...patient }: Patient) => {
         ...patient,
         id: patient.id ? patient.id : undefined,
         password: hashedPassword,
+        identificationDocumentUrl: patient.identificationDocumentUrl,
       },
     });
+
+    console.log({ newPatient });
 
     const verificationToken = await generateVerificationToken(newPatient.email);
     await sendVerificationEmail(
@@ -104,7 +106,45 @@ export const registerPatient = async ({ ...patient }: Patient) => {
       verificationToken.token
     );
 
-    return { success: "User Created!" } && parseStringify(newPatient);
+    return {
+      success: "User Created!",
+      patient: parseStringify(newPatient),
+    };
+  } catch (error) {
+    console.error("An error occurred while creating a new user", error);
+    throw new Error("Failed to register user");
+  }
+};
+
+export const registerDoctor = async ({ ...doctor }: Doctor) => {
+  try {
+    const hashedPassword = await bcrypt.hash(doctor.password, 10);
+
+    const existingUser = await getUserByEmail(doctor.email);
+
+    if (existingUser?.doctor?.email === doctor.email) {
+      return { error: "Email already in use!" };
+    }
+
+    const newDoctor = await db.doctor.create({
+      data: {
+        ...doctor,
+        id: doctor.id ? doctor.id : undefined,
+        password: hashedPassword,
+        image: doctor.image,
+        emailVerified: new Date().toISOString(),
+      },
+    });
+
+    //TO DO: MAKE IT SO THAT VERIFICATION IS NOT NECESSARY FOR DOCTORS
+
+    //const verificationToken = await generateVerificationToken(newDoctor.email);
+    //await sendVerificationEmail(
+    //verificationToken.email,
+   // verificationToken.token
+   //);
+
+    return parseStringify(newDoctor);
   } catch (error) {
     console.error("An error occurred while creating a new user", error);
     throw new Error("Failed to register user");

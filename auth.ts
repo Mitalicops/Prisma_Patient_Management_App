@@ -18,88 +18,88 @@ export const {
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
+    signOut: "/auth/login",
   },
-  events: {
-    async linkAccount({ user }) {
-      await db.patient.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
-      });
-    },
-  },
+  /// events: {
+  // async linkAccount({ user }) {
+  //   await db.patient.update({
+  //     where: { id: user.id },
+  //     data: { emailVerified: new Date() },
+  //   });
+  // },
+  // },
   callbacks: {
     async signIn({ user, account }) {
       //Allow OAuth without email verification
-      if (account?.provider !== "credentials") return true;
+      //if (account?.provider !== "credentials") return true;
 
-      const existingUser = await getUserById(user.id);
+      const existingUser = await getUserById(user.id!);
 
-      //prevent sign in without email verfication
-      if (!existingUser?.emailVerified) return false;
+      if (existingUser?.user !== null) {
+        //prevent sign in without email verfication
+        if (!existingUser?.user.emailVerified) return false;
 
-      if (existingUser.isTwoFactorEnabled) {
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-          existingUser.id
-        );
+        if (existingUser.user.isTwoFactorEnabled) {
+          const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+            existingUser.user.id
+          );
 
-        console.log({ twoFactorConfirmation });
+          if (!twoFactorConfirmation) return false;
 
-        if (!twoFactorConfirmation) return false;
+          //delete two factor confirmation for next sign in
+          await db.twoFactorConfirmation.delete({
+            where: { id: twoFactorConfirmation.id },
+          });
+        }
+      }
 
-        //delete two factor confirmation for next sign in
-        await db.twoFactorConfirmation.delete({
-          where: { id: twoFactorConfirmation.id },
-        });
+      if (existingUser?.doctor !== null) {
+        if (existingUser.doctor.isTwoFactorEnabled) {
+          const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+            existingUser.doctor.id
+          );
+
+          if (!twoFactorConfirmation) return false;
+
+          //delete two factor confirmation for next sign in
+          await db.twoFactorConfirmation.delete({
+            where: { id: twoFactorConfirmation.id },
+          });
+        }
       }
 
       return true;
     },
 
+    //problem here major one
     async session({ token, session }) {
       console.log({ sessionToken: token });
+
       if (token.sub && session.user) {
         session.user.id = token.sub;
-      }
-
-      if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
 
-      if (session.user) {
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
-      }
+      //if (token.role && session.user) {
+      //session.user.role = token.role as UserRole;
+      // }
 
       if (session.user) {
         session.user.name = token.name as string;
-        session.user.email = token.email as string;
-        session.user.phone = token.phone as string;
-        session.user.insurancePolicyNumber =
-          token.insurancePolicyNumber as string;
-        session.user.address = token.address as string;
-        session.user.birthDate = token.birthDate as Date;
-        session.user.gender = token.gender as Gender | undefined;
-        session.user.currentMedication = token.currentMedication as string;
-        session.user.allergies = token.allergies as string;
-        session.user.emergencyContactName =
-          token.emergencyContactName as string;
-        session.user.emergencyContactNumber =
-          token.emergencyContactNumber as string;
-        //session.user.identificationDocument =
-        //token.identificationDocuments as File;
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
-        session.user.identificationNumber =
-          token.identificationNumber as string;
-        session.user.insuranceProvider = token.insuranceProvider as string;
-        session.user.occupation = token.occupation as string;
-        session.user.privacyConsent = token.privacyConsent as boolean;
-        session.user.primaryPhysician = token.primaryPhysician as string;
-        session.user.pastMedicalHistory = token.pastMedicalHistory as string;
-        session.user.role = token.role as UserRole;
+        session.user.id = token.sub as string;
+        session.user.role = token.role as string;
       }
+
+      //if (session.user.patient) {
+      // session.user.patient.name = token.name!;
+      //session.user.patient.id = token.sub!;
+      // }
 
       return session;
     },
 
+    //IMPORTANT: This is the JWT callback, not the session callback
+    //This is called when the user signs in, and also when the session is created
     async jwt({ token }) {
       if (!token.sub) return token;
 
@@ -107,31 +107,23 @@ export const {
 
       if (!existingUser) return token;
 
-      const existingAccount = await getAccountByUserId(existingUser.id);
+      if (existingUser.user === null) {
+        token.sub = existingUser.doctor?.id;
+        token.name = existingUser.doctor?.name;
+        token.email = existingUser.doctor?.email;
+        token.role = existingUser.doctor?.role;
+      }
 
-      token.isOAuth = !!existingAccount;
-      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-      token.name = existingUser.name;
-      token.email = existingUser.email;
-      token.phone = existingUser.phone;
-      token.insurancePolicyNumber = existingUser.insurancePolicyNumber;
-      token.address = existingUser.address;
-      token.birthDate = existingUser.birthDate;
-      token.gender = existingUser.gender;
-      token.currentMedication = existingUser.currentMedication;
-      token.allergies = existingUser.allergies;
-      token.emergencyContactName = existingUser.emergencyContactName;
-      token.emergencyContactNumber = existingUser.emergencyContactNumber;
-      //token.identificationDocument = existingUser.identificationDocumentId;
-      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-      token.identificationNumber = existingUser.identificationNumber;
-      token.insuranceProvider = existingUser.insuranceProvider;
-      token.occupation = existingUser.occupation;
-      token.privacyConsent = existingUser.privacyConsent;
-      token.primaryPhysician = existingUser.primaryPhysician;
-      token.pastMedicalHistory = existingUser.pastMedicalHistory;
-      token.role = existingUser.role;
+      //some problem with this
 
+      if (existingUser.doctor === null) {
+        //token.isOAuth = !!existingAccount;
+        token.sub = existingUser.user?.id;
+        token.isTwoFactorEnabled = existingUser.user?.isTwoFactorEnabled;
+        token.name = existingUser.user?.name;
+        token.email = existingUser.user?.email;
+        token.role = existingUser.user?.role;
+      }
       return token;
     },
   },

@@ -15,6 +15,9 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { db } from "@/lib/db";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { LoginSchema } from "@/lib/validation";
+import { redirect } from "next/navigation";
+import { UserRole } from "@prisma/client";
+import { currentUser } from "@/lib/auth";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values);
@@ -27,13 +30,48 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
   const existingUser = await getUserByEmail(email);
 
-  if (!existingUser || !existingUser.email || !existingUser?.password) {
-    return { error: "Email does not exist!" };
+  if (!existingUser?.user?.email || !existingUser?.user?.password) {
+    if (
+      !existingUser ||
+      !existingUser.doctor?.email ||
+      !existingUser.doctor.password
+    ) {
+      return { error: "Email does not exist!" };
+    }
   }
 
-  if (!existingUser.emailVerified) {
+  if (existingUser.doctor?.email) {
+    try {
+      await signIn("credentials", {
+        email,
+        password,
+        redirectTo: "/dashboard",
+      });
+
+      return {
+        success: "Logged in!",
+      };
+    } catch (error) {
+      if ((error as any)?.digest === "NEXT_REDIRECT") {
+        return; // let Next.js handle it
+      }
+
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case "CredentialsSignin":
+            return { error: "Invalid credentials!" };
+          //default:
+          //return { error: "something went wrong!" };
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  if (!existingUser.user?.emailVerified) {
     const verificationToken = await generateVerificationToken(
-      existingUser.email
+      existingUser.user?.email!
     );
 
     await sendVerificationEmail(
@@ -43,9 +81,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     return { success: "confirmation email sent!" };
   }
 
-  if (existingUser.isTwoFactorEnabled && existingUser.email) {
+  if (existingUser.user.isTwoFactorEnabled && existingUser.user.email) {
     if (code) {
-      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
+      const twoFactorToken = await getTwoFactorTokenByEmail(
+        existingUser.user.email
+      );
       if (!twoFactorToken) {
         return { error: "Invalid code!" };
       }
@@ -63,7 +103,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
       });
 
       const existingConfirmation = await getTwoFactorConfirmationByUserId(
-        existingUser.id
+        existingUser.user.id
       );
 
       if (existingConfirmation) {
@@ -74,11 +114,13 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
       await db.twoFactorConfirmation.create({
         data: {
-          userId: existingUser.id,
+          userId: existingUser.user.id,
         },
       });
     } else {
-      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+      const twoFactorToken = await generateTwoFactorToken(
+        existingUser.user.email
+      );
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
 
       return { twoFactor: true };
@@ -89,15 +131,27 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: `/auth/${existingUser.id}/new-appointment`,
+      redirectTo: "/patient-admin",
     });
+
+    //TODO ADD ID OF DOC
+
+    //if (
+    //existingUser.user.id &&
+    //redirect(`/auth/${existingUser.user.id}/new-appointment`)
+    //) {
+    //return { success: "Logged in!" };
+    //}
+    return {
+      success: "Logged in!",
+    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
           return { error: "Invalid credentials!" };
-        default:
-          return { error: "something went wrong!" };
+        //default:
+        //return { error: "something went wrong!" };
       }
     }
 

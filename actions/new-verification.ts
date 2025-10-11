@@ -24,7 +24,7 @@ export const newVerification = async (token: string) => {
   }
 
   await db.patient.update({
-    where: { id: existingUser.id },
+    where: { id: existingUser?.user?.id },
     data: {
       emailVerified: new Date(),
       email: existingToken.email,

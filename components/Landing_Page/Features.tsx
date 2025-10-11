@@ -7,10 +7,10 @@ import Image from "next/image";
 
 import { TbHandClick } from "react-icons/tb";
 import { CustomButton } from "../../constants/Button";
-import { Doctors } from "@/constants";
-import Section from "@/constants/Section";
+import { Doctor } from "@/next-auth";
+//import Section from "@/constants/Section";
 
-const Features = () => {
+const Features = ({ doctors }: { doctors: Doctor[] }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => {
@@ -102,13 +102,13 @@ const Features = () => {
               {isVisible && (
                 <>
                   <div>
-                    {Doctors.slice(0, 3).map((doctor) => (
+                    {doctors.slice(0, 3).map((doctor) => (
                       <div
                         key={doctor.name}
                         className="flex items-center mt-3 justify-normal gap-5"
                       >
                         <Image
-                          src={doctor.image}
+                          src={doctor.image || "/assets/default-pic.jpg"}
                           width={50}
                           height={50}
                           alt={doctor.name}

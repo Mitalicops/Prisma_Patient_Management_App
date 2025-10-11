@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
-import { Doctors } from "@/constants";
 
 import StatusBadge from "../patient-manager-component/StatusBadge";
 import AppointmentModal from "../patient-manager-component/AppointmentModal";
@@ -58,19 +57,17 @@ export const columns: ColumnDef<Appointment>[] = [
     header: () => "Doctor",
     cell: ({ row }) => {
       const appointment = row.original;
-      const doctor = Doctors.find(
-        (doctor) => doctor.name === appointment.primaryPhysician
-      );
+      const doctor = appointment.Doctor;
       return (
         <div className="flex items-center gap-3">
           <Image
-            src={doctor?.image!}
+            src={doctor?.image || "/assets/default-pic.jpg"}
             alt="doctor"
             width={100}
             height={100}
-            className="size-8"
+            className="size-8 rounded-full"
           />
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          <p className="whitespace-nowrap">Dr. {doctor.name}</p>
         </div>
       );
     },
@@ -89,12 +86,14 @@ export const columns: ColumnDef<Appointment>[] = [
             patientId={appointment.patient.id}
             userId={appointment.id}
             appointment={appointment}
+            role="admin"
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
           />
 
           <AppointmentModal
             type="cancel"
+            role="admin"
             disabled={"cancelled" === appointment?.status}
             patientId={appointment.patient.id}
             userId={appointment.id}

@@ -1,5 +1,5 @@
 import { getAppointmentsForUser } from "@/actions/appointment.actions";
-import { UserButton } from "@/components/auth/user-button";
+
 import StatCard from "@/components/patient-manager-component/StatCard";
 import { currentUser } from "@/lib/auth";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import { MdCancel, MdOutlinePendingActions } from "react-icons/md";
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import { DataTable } from "@/components/Patient-Admin-table/DataTable";
 import { columns } from "@/components/Patient-Admin-table/columns";
+import { UserButton } from "@/components/auth/user-button";
 
 const AdminPage = async () => {
   const loggedIn = await currentUser();
@@ -26,14 +27,15 @@ const AdminPage = async () => {
           />
         </Link>
 
-        <UserButton />
+        <UserButton loggedInUserId={loggedIn?.id!} type="patient" />
       </header>
 
       <main className="admin-main">
         <section className="w-full space-y-4">
           <h1 className="header">Welcome👋</h1>
           <p className="text-dark-700">
-            This is Your Appointment Dashboard, Manage Your Appointments with a click of a button
+            This is Your Appointment Dashboard, Manage Your Appointments with a
+            click of a button
           </p>
         </section>
 

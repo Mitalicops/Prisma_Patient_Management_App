@@ -10,6 +10,7 @@ datasource db {
 enum UserRole {
   Admin
   Patient
+  Doctor
 }
 
 enum Gender {
@@ -57,6 +58,33 @@ model Patient {
   isTwoFactorEnabled        Boolean                @default(false)
   twoFactorConfirmation     TwoFactorConfirmation?
   appointments              Appointment[]
+  bloodTests                BloodTest[]            @relation("PatientBloodTests")
+}
+
+model Doctor {
+  id                      String                 @id @default(cuid()) @map("_id")
+  name                    String
+  email                   String                 @unique
+  phone                   String
+  gender                  Gender?
+  birthDate               DateTime?
+  address                 String?
+  specialization          String?
+  licenseNumber           String                 @unique
+  yearsOfExperience       Int?
+  education               String?
+  hospitalAffiliation     String?
+  isAvailable             Boolean // Store schedule as JSON
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  role                    UserRole               @default(Doctor)
+  accounts                Account[]
+  isTwoFactorEnabled      Boolean                @default(false)
+  twoFactorConfirmation   TwoFactorConfirmation? @relation(fields: [twoFactorConfirmationId], references: [id])
+  appointments            Appointment[] // Doctor's appointments
+  bloodTests              BloodTest[]
+  twoFactorConfirmationId String?
 }
 
 model Appointment {
@@ -69,6 +97,8 @@ model Appointment {
   cancellationReason String?
   patientId          String
   patient            Patient           @relation(fields: [patientId], references: [id])
+  Doctor             Doctor?           @relation(fields: [doctorId], references: [id])
+  doctorId           String?
 }
 
 model Account {
@@ -84,6 +114,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  doctor            Doctor? @relation(fields: [userId], references: [id]) // Update relation syntax
 
   patient Patient @relation(fields: [userId], references: [id]) // Update relation syntax
 }
@@ -118,6 +149,62 @@ model TwoFactorToken {
 model TwoFactorConfirmation {
   id String @id @default(cuid()) @map("_id")
 
-  patient Patient @relation(fields: [userId], references: [id])
-  userId  String  @unique
+  patient Patient  @relation(fields: [userId], references: [id])
+  userId  String   @unique
+  Doctor  Doctor[]
+}
+
+model BloodTest {
+  id          String   @id @default(cuid()) @map("_id")
+  patientName String
+  testDate    DateTime @default(now())
+
+  hemoglobin  Float
+  hematocrit  Float
+  wbcCount    Float
+  rbcCount    Float
+  platelets   Float
+  mcv         Float
+  mch         Float
+  mchc        Float
+  rdw         Float
+  neutrophils Float
+  lymphocytes Float
+  monocytes   Float
+  eosinophils Float
+  basophils   Float
+  esr         Float? // optional
+
+  bloodGroup    String?
+  bloodSugar    Float? // optional
+  patientWeight Float
+  age           Int
+  comments      String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], name: "PatientBloodTests")
+
+  aiFeedback AIReport?
+
+  feedbackLocked Boolean @default(false)
+}
+
+model AIReport {
+  id        String   @id @default(cuid()) @map("_id")
+  content   Json // The AI-generated feedback text (can be JSON too)
+  createdAt DateTime @default(now())
+
+  // Optional follow-up: references another AIReport
+  //followUpToId String?    
+  //followUpTo   AIReport?  @relation("FollowUp", fields: [followUpToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  //followUps    AIReport[] @relation("FollowUp")
+
+  bloodTestId String    @unique
+  bloodTest   BloodTest @relation(fields: [bloodTestId], references: [id])
 }

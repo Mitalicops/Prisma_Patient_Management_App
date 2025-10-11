@@ -2,6 +2,71 @@ import { Gender, UserRole } from "@prisma/client";
 import { RiCalendarScheduleFill } from "react-icons/ri";
 
 export const GenderOptions = ["Male", "Female", "Other"];
+export const RoleOptions = ["Admin", "Doctor", "Patient"];
+
+export const NavLinks = [
+  {
+    id: 1,
+    name: "Dashboard",
+    href: "/dashboard",
+  },
+  {
+    id: 2,
+    name: "Appointments",
+    href: "/appointments",
+  },
+  {
+    id: 3,
+    name: "Patients",
+    href: "/patients",
+  },
+
+  {
+    id: 4,
+    name: "MedicalTests",
+    href: "/MedicalTests",
+  },
+  {
+    id: 5,
+    name: "Settings",
+    href: "/settings",
+  },
+];
+
+export const BloodGroups = [
+  {
+    id: 1,
+    name: "A+",
+  },
+  {
+    id: 2,
+    name: "A-",
+  },
+  {
+    id: 3,
+    name: "B+",
+  },
+  {
+    id: 4,
+    name: "B-",
+  },
+  {
+    id: 5,
+    name: "AB+",
+  },
+  {
+    id: 6,
+    name: "AB-",
+  },
+  {
+    id: 7,
+    name: "O+",
+  },
+  {
+    id: 8,
+    name: "O-",
+  },
+];
 
 export const PatientFormDefaultValues = {
   id: "",
@@ -23,6 +88,7 @@ export const PatientFormDefaultValues = {
   familyMedicalHistory: "",
   pastMedicalHistory: "",
   identificationType: "Birth Certificate",
+  identificationDocumentUrl: "",
   identificationNumber: "",
   treatmentConsent: false,
   disclosureConsent: false,
@@ -41,6 +107,7 @@ export enum FormFieldType {
   SELECT = "select",
   SKELETON = "skeleton",
   PASSWORD = "password",
+  NUMBER = "number",
 }
 
 export const IdentificationTypes = [
@@ -57,42 +124,37 @@ export const IdentificationTypes = [
   "Voter ID Card",
 ];
 
-export const Doctors = [
+export const Specializations = [
   {
-    image: "/assets/images/dr-green.png",
-    name: "John Green",
+    name: "Ophthalmologist",
   },
   {
-    image: "/assets/images/dr-cameron.png",
-    name: "Leila Cameron",
+    name: "Cardiologist",
   },
   {
-    image: "/assets/images/dr-livingston.png",
-    name: "David Livingston",
+    name: "Dermatologist",
   },
   {
-    image: "/assets/images/dr-peter.png",
-    name: "Evan Peter",
+    name: "Pediatrician",
   },
   {
-    image: "/assets/images/dr-powell.png",
-    name: "Jane Powell",
+    name: "Neurologist",
   },
   {
-    image: "/assets/images/dr-remirez.png",
-    name: "Alex Ramirez",
+    name: "Gynecologist",
   },
   {
-    image: "/assets/images/dr-lee.png",
-    name: "Jasmine Lee",
+    name: "Orthopedic Surgeon",
   },
   {
-    image: "/assets/images/dr-cruz.png",
-    name: "Alyana Cruz",
+    name: "General Practitioner",
   },
   {
-    image: "/assets/images/dr-sharma.png",
-    name: "Hardik Sharma",
+    name: "Dentist",
+  },
+
+  {
+    name: "Oncologist",
   },
 ];
 

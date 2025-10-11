@@ -15,21 +15,27 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Appointment } from "@/types";
 import { AppointmentForm } from "../forms/AppointmentForm";
+import { Doctor } from "@/next-auth";
+import { Specializations } from "@/constants";
 
 const AppointmentModal = ({
   type,
   patientId,
   userId,
+  role,
   appointment,
+  doctors,
   disabled,
 }: {
   type: "schedule" | "cancel";
   patientId: string | null;
   userId: string;
+  role: "patient" | "admin" | "doctor";
   appointment?: Appointment;
   title: string;
   description: string;
   disabled?: boolean;
+  doctors?: Doctor[];
 }) => {
   const [Open, setOpen] = useState(false);
 
@@ -57,7 +63,9 @@ const AppointmentModal = ({
         <AppointmentForm
           userId={userId}
           patientId={patientId}
+          doctors={doctors}
           type={type}
+          role={role}
           appointment={appointment}
           setOpen={setOpen}
         />
