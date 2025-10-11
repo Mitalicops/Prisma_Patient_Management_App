@@ -67,7 +67,7 @@ export const getPatient = async (userId: string) => {
       where: { id: userId },
     });
 
-    return parseStringify(patient);
+    return patient;
   } catch (error) {
     console.log({ error });
   }

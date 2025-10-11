@@ -9,13 +9,13 @@ import { Form, FormControl } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { SelectItem } from "@/components/ui/select";
+import { SelectGroup, SelectItem, SelectLabel } from "@/components/ui/select";
 import {
-  Doctors,
   FormFieldType,
   GenderOptions,
   IdentificationTypes,
   PatientFormDefaultValues,
+  Specializations,
 } from "@/constants";
 import { PatientFormValidation } from "@/lib/validation";
 
@@ -32,8 +32,18 @@ import { FormSuccess } from "../form-success";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { registerPatient } from "@/actions/patient.actions";
 import { SubmitButton } from "../patient-manager-component/SubmitButton";
+import { Doctor } from "@/next-auth";
+import { UserRole } from "@prisma/client";
 
-const RegisterForm = () => {
+type doctors = {
+  name: string;
+  email: string;
+  id: string;
+  image: string | null;
+  specialization: string | null;
+}[];
+
+const RegisterForm = ({ Doctors }: { Doctors: doctors }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -100,6 +110,7 @@ const RegisterForm = () => {
         treatmentConsent: values.treatmentConsent,
         disclosureConsent: values.disclosureConsent,
         privacyConsent: values.privacyConsent,
+        role: UserRole.Patient,
       };
 
       const newPatient = await registerPatient(patient);
@@ -252,20 +263,33 @@ const RegisterForm = () => {
             label="Primary Physician"
             placeholder="Select a Primary Physician"
           >
-            {Doctors.map((doctor) => (
-              <SelectItem key={doctor.name} value={doctor.name}>
-                <div className="flex cursor-pointer items-center gap-2">
-                  <Image
-                    src={doctor.image}
-                    width={32}
-                    height={32}
-                    alt={doctor.name}
-                    className="rounded-full border border-dark-500"
-                  />
-                  <p>{doctor.name}</p>
-                </div>
-              </SelectItem>
-            ))}
+            {Specializations.map((specialization) => {
+              const doctorsInSpecialization = Doctors?.filter(
+                (doctor) => doctor.specialization === specialization.name
+              );
+
+              if (!doctorsInSpecialization?.length) return null;
+
+              return (
+                <SelectGroup key={specialization.name}>
+                  <SelectLabel>{specialization.name}</SelectLabel>
+                  {doctorsInSpecialization.map((doctor) => (
+                    <SelectItem key={doctor.id} value={doctor.id}>
+                      <div className="flex cursor-pointer items-center gap-2">
+                        <Image
+                          src={doctor.image!}
+                          width={32}
+                          height={32}
+                          alt={doctor.name}
+                          className="rounded-full h-8 w-8 border border-dark-500"
+                        />
+                        <p>{doctor.name}</p>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              );
+            })}
           </CustomForm>
 
           <div className="flex flex-col gap-6 xl:flex-row">

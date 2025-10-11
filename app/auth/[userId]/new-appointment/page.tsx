@@ -24,9 +24,10 @@ const NewAppointment = async ({ params: { userId } }: SearchParamProps) => {
 
           <AppointmentForm
             type="create"
+            role={patient?.role!}
             userId={userId}
-            doctors={doctors }
-            patientId={patient.id}
+            doctors={doctors}
+            patientId={patient?.id!}
           />
 
           <p className="copyright mt-10 py-10">© 2024 CarePulse</p>

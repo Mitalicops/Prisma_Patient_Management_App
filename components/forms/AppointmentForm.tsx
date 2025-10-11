@@ -22,9 +22,17 @@ import {
   CreateAppointment,
   updateAppointment,
 } from "@/actions/appointment.actions";
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, UserRole } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { Doctor } from "@/next-auth";
+
+type doctors = {
+  name: string;
+  email: string;
+  id: string;
+  image: string | null;
+  specialization: string | null;
+}[];
 
 export const AppointmentForm = ({
   patientId,
@@ -37,8 +45,8 @@ export const AppointmentForm = ({
 }: {
   patientId: string | null;
   userId: string;
-  role: "patient" | "admin" | "doctor";
-  doctors?: Doctor[];
+  role: UserRole;
+  doctors?: doctors;
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: (open: boolean) => void;

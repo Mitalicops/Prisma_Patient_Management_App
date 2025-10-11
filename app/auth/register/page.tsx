@@ -1,3 +1,4 @@
+import { getAllDoctors } from "@/actions/doctor.actions";
 import RegisterForm from "@/components/forms/RegisterForm";
 import PasskeyModal from "@/components/patient-manager-component/PasskeyModal";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,8 @@ import { SearchParamProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 
-const RegisterPage = () => {
+const RegisterPage = async () => {
+  const doctors = await getAllDoctors();
   //const isAdmin = searchParams.admin === "true";
   return (
     <div className="flex h-screen max-h-screen">
@@ -19,7 +21,7 @@ const RegisterPage = () => {
             className="mb-12 h-10 w-fit"
           />
 
-          <RegisterForm />
+          <RegisterForm Doctors={doctors} />
 
           <div className="text-14-regular mt-20 items-center flex justify-between">
             <p className="justify-items-end text-dark-600 xl:text-left">
