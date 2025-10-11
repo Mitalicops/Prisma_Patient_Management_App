@@ -10,7 +10,15 @@ import { CustomButton } from "../../constants/Button";
 import { Doctor } from "@/next-auth";
 //import Section from "@/constants/Section";
 
-const Features = ({ doctors }: { doctors: Doctor[] }) => {
+type doctors = {
+  name: string;
+  id: string;
+  email: string;
+  image: string | null;
+  specialization: string | null;
+}[];
+
+const Features = ({ doctors }: { doctors: doctors }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => {
