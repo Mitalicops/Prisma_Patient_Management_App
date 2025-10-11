@@ -56,11 +56,12 @@ ${JSON.stringify(bloodTest, null, 2)}
       apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
 
-    const model = google("gemini-2.0-flash", {
+    const model = google(
+      "gemini-2.0-flash"
       // structuredOutputs: false,
-    });
+    );
 
-    const { object: aiReport } = await generateObject<AIReport>({
+    const { object: aiReport } = await generateObject({
       model,
       prompt,
       schema: aiReportSchema,
@@ -91,7 +92,6 @@ ${JSON.stringify(bloodTest, null, 2)}
 
 export async function getAIReport(bloodTestId: string) {
   try {
-
     const data = await db.aIReport.findUnique({
       where: { bloodTestId: bloodTestId },
     });
