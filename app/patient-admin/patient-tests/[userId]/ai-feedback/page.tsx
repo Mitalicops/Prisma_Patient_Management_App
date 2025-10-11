@@ -3,8 +3,9 @@ import AIFeedbackUI from "@/components/Patient-Admin-table/AI-feedbackUI";
 import { AIReport } from "@/types";
 import React from "react";
 
-const AIFeedbackPage = async ({ params }: { params: { userId: string } }) => {
-  const data = await getAIReport(params.userId);
+const AIFeedbackPage = async ({ params }: { params: Promise<{ userId: string }> }) => {
+   const { userId } = await params; // ✅ Fix here
+  const data = await getAIReport(userId);
 
   console.log("AI Feedback Data:", data);
   return (
