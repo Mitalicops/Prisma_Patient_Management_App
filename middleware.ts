@@ -8,10 +8,10 @@ import {
   authRoutes,
   publicRoutes,
 } from "@/routes";
-
+import { currentRole } from "./lib/auth";
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+export default auth(async (req) => {
   const { nextUrl } = req;
 
   const isLoggedIn = !!req.auth;
@@ -26,11 +26,19 @@ export default auth((req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      const role = await currentRole();
+      const redirectTo =
+        role === "Admin"
+          ? "/admin"
+          : role === "Doctor"
+          ? "/dashboard"
+          : DEFAULT_LOGIN_REDIRECT;
+
+      console.log({ role, redirectTo });
+      return Response.redirect(new URL(redirectTo, nextUrl));
     }
     return null;
   }
-
 
   if (!isLoggedIn && !isPublicRoute) {
     return Response.redirect(new URL("/auth/login", nextUrl));

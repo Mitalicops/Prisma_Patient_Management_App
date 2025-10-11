@@ -37,7 +37,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
   }
 
-  if (existingUser.doctor?.email) {
+  if (existingUser.doctor?.email !== null) {
     try {
       await signIn("credentials", {
         email,

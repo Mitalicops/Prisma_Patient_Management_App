@@ -137,7 +137,7 @@ export const getAppointment = async (appointmentId: string) => {
     const appointment = await db.appointment.findUnique({
       where: { id: appointmentId },
     });
-    return parseStringify(appointment);
+    return appointment
   } catch (error) {
     console.log("An error occurred in fetching the appointments", error);
   }

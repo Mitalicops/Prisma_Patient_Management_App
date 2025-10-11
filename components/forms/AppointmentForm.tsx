@@ -105,7 +105,7 @@ export const AppointmentForm = ({
         if (appointment) {
           form.reset();
           router.push(
-            `/auth/${userId}/new-appointment/success?appointmentId=${appointment.id}`
+            `/auth/${userId}/new-appointment/${appointment.id}/success`
           );
         }
       } else {

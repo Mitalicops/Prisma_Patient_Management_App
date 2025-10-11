@@ -18,21 +18,16 @@ export const LoginButton = ({
   asChild,
 }: LoginButtonProps) => {
   const router = useRouter();
+
   const onClick = () => {
     //router.push("/auth/login");
-    signIn("credentials", {
-      callbackUrl:
-        role === "Admin"
-          ? "/admin"
-          : role === "Doctor"
-          ? "/dashboard"
-          : "/patient-admin",
-    });
+    signIn("credentials");
   };
 
   if (mode === "modal") {
     return <span>TODO: IMPLENT MODAL</span>;
   }
+  console.log({ role });
   return (
     <Button
       variant="landing_page"

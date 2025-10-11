@@ -10,12 +10,16 @@ import { FaRegCalendarDays } from "react-icons/fa6";
 const SuccessPage = async ({
   params,
 }: {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ appointmentId: string }>;
 }) => {
-  const { userId } = await params;
+  const { appointmentId } = await params;
 
-  const appointment = await getAppointment(userId);
-  const doctor = await getDoctorWithAppointmentId(userId);
+  console.log(appointmentId);
+
+  const appointment = await getAppointment(appointmentId);
+  const doctor = await getDoctorWithAppointmentId(appointmentId);
+
+  console.log(appointment, doctor);
 
   return (
     <div className="flex h-screen max-h-screen px-[5%]">
@@ -50,7 +54,7 @@ const SuccessPage = async ({
 
           <div className="flex items-center gap-3">
             <Image
-              src={doctor?.image!}
+              src={doctor?.image || "/assets/default-pic.jpg"}
               alt="doctor"
               width={100}
               height={100}
@@ -63,13 +67,13 @@ const SuccessPage = async ({
           <div className="flex items-center gap-2">
             <FaRegCalendarDays height={25} width={25} />
 
-            <p>{formatDateTime(appointment.schedule).dateTime}</p>
+            <p>{formatDateTime(appointment?.schedule!).dateTime}</p>
           </div>
         </section>
 
         <div className="flex items-center gap-5 flex-col lg:flex-row">
           <Button variant="outline" className="shad-primary-btn" asChild>
-            <Link href={`/auth/${appointment.patientId}/new-appointment`}>
+            <Link href={`/auth/${appointment?.patientId}/new-appointment`}>
               New Appointment
             </Link>
           </Button>
