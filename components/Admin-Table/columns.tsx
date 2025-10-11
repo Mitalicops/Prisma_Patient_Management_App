@@ -67,7 +67,7 @@ export const columns: ColumnDef<Appointment>[] = [
             height={100}
             className="size-8 rounded-full"
           />
-          <p className="whitespace-nowrap">Dr. {doctor.name}</p>
+          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
         </div>
       );
     },
@@ -86,14 +86,14 @@ export const columns: ColumnDef<Appointment>[] = [
             patientId={appointment.patient.id}
             userId={appointment.id}
             appointment={appointment}
-            role="admin"
+            role="Admin"
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
           />
 
           <AppointmentModal
             type="cancel"
-            role="admin"
+            role="Admin"
             disabled={"cancelled" === appointment?.status}
             patientId={appointment.patient.id}
             userId={appointment.id}
