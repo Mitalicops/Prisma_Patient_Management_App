@@ -7,12 +7,8 @@ import Link from "next/link";
 import React from "react";
 import { FaRegCalendarDays } from "react-icons/fa6";
 
-const SuccessPage = async ({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) => {
-  const appointmentId = (await params).userId;
+const SuccessPage = async ({ params }: { params: { userId: string } }) => {
+  const appointmentId = params.userId;
 
   const appointment = await getAppointment(appointmentId);
   const doctor = await getDoctorWithAppointmentId(appointmentId);
