@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getAppointmentSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 
@@ -53,7 +53,7 @@ export const AppointmentForm = ({
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
+  const memoizedDoctors = useMemo(() => doctors, [doctors]);
   const AppointmentFormValidation = getAppointmentSchema(type);
 
   // 1. Define your form.
@@ -163,7 +163,7 @@ export const AppointmentForm = ({
           </section>
         )}
 
-        {type !== "cancel" && role === "admin" && (
+        {type !== "cancel" && role === "Patient" && (
           <CustomForm
             fieldType={FormFieldType.SELECT}
             control={form.control}
@@ -172,7 +172,7 @@ export const AppointmentForm = ({
             placeholder="Select a Doctor"
           >
             {Specializations.map((specialization) => {
-              const doctorsInSpecialization = doctors?.filter(
+              const doctorsInSpecialization = memoizedDoctors?.filter(
                 (doctor) => doctor.specialization === specialization.name
               );
 
@@ -212,15 +212,15 @@ export const AppointmentForm = ({
               dateFormat="MM/dd/yyyy - hh:mm aa"
             />
 
-            {role === "admin" ||
-              (role === "doctor" && (
+            {role === "Admin" ||
+              (role === "Doctor" && (
                 <div className="flex flex-col gap-6 xl:flex-row">
                   <CustomForm
                     fieldType={FormFieldType.TEXTAREA}
                     control={form.control}
                     name="reason"
-                    label="Reason for Appointment"
                     disabled
+                    label="Reason for Appointment"
                     placeholder="Enter Reason For appointment"
                   />
 
@@ -228,21 +228,20 @@ export const AppointmentForm = ({
                     fieldType={FormFieldType.TEXTAREA}
                     control={form.control}
                     name="note"
-                    label="Notes"
                     disabled
+                    label="Notes"
                     placeholder="Enter Notes"
                   />
                 </div>
               ))}
 
-            {role === "patient" && (
+            {role === "Patient" && (
               <div className="flex flex-col gap-6 xl:flex-row">
                 <CustomForm
                   fieldType={FormFieldType.TEXTAREA}
                   control={form.control}
                   name="reason"
                   label="Reason for Appointment"
-                  disabled
                   placeholder="Enter Reason For appointment"
                 />
 
@@ -251,7 +250,6 @@ export const AppointmentForm = ({
                   control={form.control}
                   name="note"
                   label="Notes"
-                  disabled
                   placeholder="Enter Notes"
                 />
               </div>

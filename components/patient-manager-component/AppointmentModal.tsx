@@ -17,6 +17,15 @@ import { Appointment } from "@/types";
 import { AppointmentForm } from "../forms/AppointmentForm";
 import { Doctor } from "@/next-auth";
 import { Specializations } from "@/constants";
+import { UserRole } from "@prisma/client";
+
+type doctors = {
+  name: string;
+  email: string;
+  id: string;
+  image: string | null;
+  specialization: string | null;
+}[];
 
 const AppointmentModal = ({
   type,
@@ -30,12 +39,12 @@ const AppointmentModal = ({
   type: "schedule" | "cancel";
   patientId: string | null;
   userId: string;
-  role: "patient" | "admin" | "doctor";
+  role: UserRole;
   appointment?: Appointment;
   title: string;
   description: string;
   disabled?: boolean;
-  doctors?: Doctor[];
+  doctors?: doctors;
 }) => {
   const [Open, setOpen] = useState(false);
 

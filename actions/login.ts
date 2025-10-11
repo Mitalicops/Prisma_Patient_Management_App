@@ -15,9 +15,6 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { db } from "@/lib/db";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { LoginSchema } from "@/lib/validation";
-import { redirect } from "next/navigation";
-import { UserRole } from "@prisma/client";
-import { currentUser } from "@/lib/auth";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values);

@@ -66,14 +66,14 @@ export const DoctorColumns: ColumnDef<DoctorsAppointment>[] = [
             patientId={appointment.patient.id}
             userId={appointment.id}
             appointment={appointment}
-            role="doctor"
+            role="Doctor"
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
           />
 
           <AppointmentModal
             type="cancel"
-            role="doctor"
+            role="Doctor"
             disabled={"cancelled" === appointment?.status}
             patientId={appointment.patient.id}
             userId={appointment.id}

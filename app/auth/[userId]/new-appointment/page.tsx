@@ -5,12 +5,13 @@ import { AppointmentForm } from "@/components/forms/AppointmentForm";
 import { User } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 
 const NewAppointment = async ({ params }: { params: { userId: string } }) => {
-  const userId = params.userId;
+  const userId = await params.userId;
   const patient = await getPatient(userId);
   const doctors = await getAllDoctors();
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">

@@ -15,22 +15,22 @@ export const NavLinks = [
     name: "Appointments",
     href: "/appointments",
   },
-  {
-    id: 3,
-    name: "Patients",
-    href: "/patients",
-  },
+  //{
+  // id: 3,
+  //  name: "Patients",
+  //  href: "/patients",
+  //},
 
   {
     id: 4,
     name: "MedicalTests",
     href: "/MedicalTests",
   },
-  {
-    id: 5,
-    name: "Settings",
-    href: "/settings",
-  },
+  //{
+  //  id: 5,
+  // name: "Settings",
+  // href: "/settings",
+  //},
 ];
 
 export const BloodGroups = [

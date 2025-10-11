@@ -14,28 +14,32 @@ const MedicalTests = () => {
       <MedTestsCard
         icon={<MdBloodtype className="text-red-800" size={40} />}
         title="X-Ray"
+        description="Coming soon"
         href="/bloodtest"
       />
 
       <MedTestsCard
         icon={<MdBloodtype className="text-red-800" size={40} />}
         title="MRI Scan"
-        href="/bloodtest"
+        description="Coming soon"
+
       />
       <MedTestsCard
         icon={<MdBloodtype className="text-red-800" size={40} />}
         title="CT Scan"
-        href="/bloodtest"
+        description="Coming soon"
       />
       <MedTestsCard
         icon={<MdBloodtype className="text-red-800" size={40} />}
         title="Ultrasound"
-        href="/bloodtest"
+        description="Coming soon"
+      
       />
       <MedTestsCard
         icon={<MdBloodtype className="text-red-800" size={40} />}
         title="ECG"
-        href="/bloodtest"
+        description="Coming soon"
+
       />
     </div>
   );

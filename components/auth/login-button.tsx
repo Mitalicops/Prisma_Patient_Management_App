@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { signIn } from "next-auth/react";
 
 interface LoginButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   mode?: "modal" | "redirect";
   asChild?: boolean;
   role?: any;
@@ -18,22 +20,27 @@ export const LoginButton = ({
   const router = useRouter();
   const onClick = () => {
     //router.push("/auth/login");
-
-    if (role === "Doctor") {
-      router.push("/dashboard");
-    } else if (role === "Patient") {
-      router.push("/patient-admin");
-    } else if (role === "Admin") {
-      router.push("/admin");
-    }
+    signIn("credentials", {
+      callbackUrl:
+        role === "Admin"
+          ? "/admin"
+          : role === "Doctor"
+          ? "/dashboard"
+          : "/patient-admin",
+    });
   };
 
   if (mode === "modal") {
     return <span>TODO: IMPLENT MODAL</span>;
   }
   return (
-    <span onClick={onClick} className="cursor-pointer">
-      {children}
-    </span>
+    <Button
+      variant="landing_page"
+      size="lg"
+      onClick={onClick}
+      className="cursor-pointer"
+    >
+      Sign In
+    </Button>
   );
 };

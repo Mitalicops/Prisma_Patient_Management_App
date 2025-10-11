@@ -42,49 +42,42 @@ export const LoginForm = () => {
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
 
-    try {
-      const user = {
-        email: values.email,
-        password: values.password,
-      };
+    const user = {
+      email: values.email,
+      password: values.password,
+    };
 
-      const newUser = await login(user);
+    const newUser = await login(user);
 
-      //if (newUser) {
-
-      //}
-
-      if (newUser?.error) {
-        form.reset();
-        setError(newUser.error);
-      }
-
-      if (newUser?.success) {
-        form.reset();
-        setSuccess(newUser.success);
-
-        //const role = newUser.role;
-
-        //        if (role === "Admin") {
-        //        router.push("/admin");
-        //    } else if (role === "Doctor") {
-        //    router.push("/dashboard");
-        // } else if (role === "Patient") {
-        // router.push("/patient-admin");
-        //}
-      }
-
-      if (newUser?.twoFactor) {
-        setShowTwoFactor(true);
-      }
-
+    if (newUser?.error) {
+      form.reset();
+      setError(newUser.error);
       setIsLoading(false);
-
-      return newUser;
-    } catch (error) {
-      console.log(error);
-      setError("something went wrong");
+      return;
     }
+
+    if (newUser?.success) {
+      form.reset();
+      setSuccess(newUser.success);
+
+      //const role = newUser.role;
+
+      //        if (role === "Admin") {
+      //        router.push("/admin");
+      //    } else if (role === "Doctor") {
+      //    router.push("/dashboard");
+      // } else if (role === "Patient") {
+      // router.push("/patient-admin");
+      //}
+      setIsLoading(false);
+      return;
+    }
+
+    if (newUser?.twoFactor) {
+      setShowTwoFactor(true);
+    }
+
+    setIsLoading(false);
   }
 
   return (
