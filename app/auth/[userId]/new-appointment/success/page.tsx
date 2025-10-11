@@ -2,17 +2,17 @@ import { getAppointment } from "@/actions/appointment.actions";
 import { getDoctorWithAppointmentId } from "@/actions/doctor.actions";
 import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/utils";
-import { SearchParamProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { FaRegCalendarDays } from "react-icons/fa6";
 
 const SuccessPage = async ({
-  params: { id },
-  searchParams,
-}: SearchParamProps) => {
-  const appointmentId = (searchParams?.appointmentId as string) || "";
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) => {
+  const appointmentId = (await params).userId;
 
   const appointment = await getAppointment(appointmentId);
   const doctor = await getDoctorWithAppointmentId(appointmentId);

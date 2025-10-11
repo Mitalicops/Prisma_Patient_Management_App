@@ -25,11 +25,6 @@ export type DoctorsAppointment = {
   patientId?: string;
 };
 
-declare type SearchParamProps = {
-  params: { [key: string]: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
 //declare type Gender = "Male" | "Female" | "Other";
 declare type Status = "pending" | "scheduled" | "cancelled";
 
@@ -91,5 +86,3 @@ export type AIReport = {
   recommendations: string[]; // medical suggestions (e.g., “Repeat test in 1 week”)
   lifestyleAdvice: string[]; // plain health suggestions (e.g., “Increase iron intake”)
 };
-
-

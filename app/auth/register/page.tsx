@@ -2,7 +2,6 @@ import { getAllDoctors } from "@/actions/doctor.actions";
 import RegisterForm from "@/components/forms/RegisterForm";
 import PasskeyModal from "@/components/patient-manager-component/PasskeyModal";
 import { Button } from "@/components/ui/button";
-import { SearchParamProps } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 

@@ -2,12 +2,17 @@ import { getAllDoctors } from "@/actions/doctor.actions";
 import { getPatient } from "@/actions/patient.actions";
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
 
-import { SearchParamProps, User } from "@/types";
+import {  User } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const NewAppointment = async ({ params: { userId } }: SearchParamProps) => {
+const NewAppointment = async ({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) => {
+  const userId = (await params).userId;
   const patient = await getPatient(userId);
   const doctors = await getAllDoctors();
   return (
