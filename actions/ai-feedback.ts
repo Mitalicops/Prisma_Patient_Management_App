@@ -56,12 +56,10 @@ ${JSON.stringify(bloodTest, null, 2)}
       apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
 
-    const model = google(
-      "gemini-2.0-flash"
-      // structuredOutputs: false,
-    );
+    const model = google("gemini-2.0-flash");
 
     const { object: aiReport } = await generateObject({
+      //@ts-ignore
       model,
       prompt,
       schema: aiReportSchema,
