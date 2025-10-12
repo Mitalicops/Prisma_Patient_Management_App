@@ -30,12 +30,12 @@ export default async function DocDashboardLayout({
         <div className={inter.className}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="p-[2%]">
-              <SecondNav isDocAvailable={isDocAvailable!} />
+              <div>
+                <div>
+                  <Nav isDocAvailable={isDocAvailable!}>{children}</Nav>
+                </div>
 
-              <div className="flex">
-                <Nav />
-
-                {children}
+                
               </div>
 
               <Toaster />
