@@ -64,28 +64,30 @@ const Nav = ({
         </div>
 
         <div className="flex">
-          {open && (
-            <div
-              className={`flex flex-col h-screen bg-slate-900 rounded-md  p-4 gap-4 max-sm:gap-2 max-sm:p-2`}
-            >
-              {NavLinks.map((link) => {
-                const isActive = pathname === link.href;
+          <div
+            className={cn(
+              `hidden flex-col h-screen bg-slate-900 max-[756px]:flex rounded-md transition-all duration-500 ease-in-out p-4 gap-4 max-sm:gap-2 max-sm:p-2 ${
+                open ? "w-[30%]" : "w-0 h-0 bg-transparent"
+              }`
+            )}
+          >
+            {NavLinks.map((link) => {
+              const isActive = pathname === link.href;
 
-                return (
-                  <div
-                    key={link.id}
-                    className={cn(
-                      `p-2 rounded-md text-center duration-500 ease-in-out ${
-                        isActive ? "text-white bg-emerald-900" : "text-gray-400"
-                      }`
-                    )}
-                  >
-                    <Link href={link.href}>{link.name}</Link>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+              return (
+                <div
+                  key={link.id}
+                  className={cn(
+                    `p-2 rounded-md text-center duration-500 ease-in-out ${
+                      isActive ? "text-white bg-emerald-900" : "text-gray-400"
+                    } ${open ? "" : "hidden"}`
+                  )}
+                >
+                  <Link href={link.href}>{link.name}</Link>
+                </div>
+              );
+            })}
+          </div>
 
           {windowWidth > 756 && (
             <div
